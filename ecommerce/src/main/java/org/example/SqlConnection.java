@@ -1,41 +1,21 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class SqlConnection {
-    public static String Connection() {
+    private Connection connection;
+    public SqlConnection() {
         Connection conn = null;
         try {
-            Class.forName("org.sqlite.JDBC");
+            this.connection = null;
+            String url = "jdbc:sqlite:../../../../../SQLite/Database/db_ecommerce.db";
 
-            String url = "jdbc:sqlite:../../../../../SQLite/Database/ecommerce.db";
-
-            conn = DriverManager.getConnection(url);
-
-            String respon;
-            respon = "Koneksi ke database berhasil!";
-            return respon;
-
-
-        } catch (ClassNotFoundException e) {
-            System.out.println("Driver SQLite tidak ditemukan!");
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("Koneksi ke database gagal!");
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                    System.out.println("Koneksi database ditutup!");
-                }
-            } catch (SQLException e) {
-                System.out.println("Tidak dapat menutup koneksi database!");
-                e.printStackTrace();
-            }
+            this.connection = DriverManager.getConnection(url);
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
         }
-        return null;
+    }
+    public Connection getConnection() {
+        return connection;
     }
 }

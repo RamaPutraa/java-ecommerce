@@ -1,19 +1,16 @@
 package org.example;
 
-import java.net.InetSocketAddress;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpExchange;
+import javax.xml.crypto.Data;
 import java.io.IOException;
-import java.util.concurrent.Executors;
+import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        try{
-            HttpServer httpserver = HttpServer.create(new InetSocketAddress("localhost", 8127),0);
-            httpserver.createContext("/", new Server());
-            httpserver.setExecutor(Executors.newSingleThreadExecutor());
-            httpserver.start();
-            System.out.println("Listening on port 8127...");
-        }catch(Exception e){
+    public static void main(String[] args) throws Exception {
+        HttpConnection httpConnection = new HttpConnection();
+        try {
+            httpConnection.startServer();
+        }catch (IOException e){
             e.printStackTrace();
         }
     }
