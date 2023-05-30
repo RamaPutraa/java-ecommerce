@@ -2,18 +2,13 @@ package org.example;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 
-import javax.xml.crypto.Data;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
-import java.util.HashMap;
 
-public class UsersHandler {
+public class Users {
     private SqlConnection sqlConnection;
 
-    public UsersHandler(SqlConnection sqlConnection){
+    public Users(SqlConnection sqlConnection){
         this.sqlConnection = sqlConnection;
     }
 
@@ -163,66 +158,5 @@ public class UsersHandler {
             e.printStackTrace();
         }
         return jsonArray.toString();
-    }
-
-    public String deleteMethod(int userId){
-        PreparedStatement statement = null;
-        int rowsAffected = 0;
-        try {
-            String query = "DELETE FROM users WHERE id=" + userId;
-            statement = this.sqlConnection.getConnection().prepareStatement(query);
-            rowsAffected = statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        return rowsAffected + " rows deleted!";
-    }
-
-    public String postMethod(JSONObject requestBodyJson){
-        String firstName = requestBodyJson.optString("first_name");
-        String lastName = requestBodyJson.optString("last_name");
-        String email = requestBodyJson.optString("email");
-        String phoneNumber = requestBodyJson.optString("phone_number");
-        String type = requestBodyJson.optString("type");
-        PreparedStatement statement = null;
-        int rowsAffected = 0;
-
-        String query = "INSERT INTO users(first_name, last_name, email, phone_numer, type) VALUES(?,?,?,?,?)";
-        try {
-            statement = sqlConnection.getConnection().prepareStatement(query);
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, email);
-            statement.setString(4, phoneNumber);
-            statement.setString(5, type);
-            rowsAffected = statement.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return rowsAffected + " rows inserted!";
-    }
-
-    public String putMethod(String userId, JSONObject requestBodyJson){
-        String firstName = requestBodyJson.optString("first_name");
-        String lastName = requestBodyJson.optString("last_name");
-        String email = requestBodyJson.optString("email");
-        String phoneNumber = requestBodyJson.optString("phone_number");
-        String type = requestBodyJson.optString("type");
-        PreparedStatement statement = null;
-        int rowsAffected = 0;
-
-        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_numer = ?, type = ? WHERE id=" + userId;
-        try {
-            statement = sqlConnection.getConnection().prepareStatement(query);
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, email);
-            statement.setString(4, phoneNumber);
-            statement.setString(5, type);
-            rowsAffected = statement.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return rowsAffected + " rows updated!";
     }
 }

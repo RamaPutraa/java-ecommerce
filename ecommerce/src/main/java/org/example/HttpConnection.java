@@ -13,15 +13,15 @@ import java.util.concurrent.Executors;
 
 
 public class HttpConnection {
-    private UsersHandler usersHandler;
+    private Users usersHandler;
 //    private ProductsHandler productsHandler;
-//    private OrdersHandler ordersHandler;
+    private Orders ordersHandler;
 
     public HttpConnection(){
         SqlConnection sqlcon = new SqlConnection();
-        usersHandler = new UsersHandler(sqlcon);
+        usersHandler = new Users(sqlcon);
 //        productsHandler = new ProductsHandler(sqlcon);
-//        ordersHandler = new OrdersHandler(sqlcon);
+        ordersHandler = new Orders(sqlcon);
     }
 
     public void startServer() throws IOException {
@@ -44,7 +44,7 @@ public class HttpConnection {
                 }else if(path[1].equals("products")){
 //                    response = productsHandler.getProducts(0);
                 }else if(path[1].equals("orders")){
-//                    response = ordersHandler.getOrders(path[2]);
+                    response = ordersHandler.getOrders(path[2]);
                 }
             }else if(method.equals("DELETE")){
 
