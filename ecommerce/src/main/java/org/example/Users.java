@@ -15,7 +15,7 @@ public class Users {
     public String getUsers(int usersId, String addedQuery){
         JSONArray jsonArray = new JSONArray();
         String querySQL = "";
-
+        String queryAddress = "SELECT * FROM addresses WHERE id="+usersId;
         if (usersId == 0) {
             querySQL = "SELECT * FROM users";
         }else if(addedQuery != null) {
@@ -64,6 +64,21 @@ public class Users {
                 jsonUSer.put("email", resultSet.getString("email"));
                 jsonUSer.put("phoneNumber", resultSet.getString("phone_number"));
                 jsonUSer.put("type", resultSet.getString("type"));
+                JSONArray jsonAddressArray = new JSONArray();
+                try{
+                    Statement statmentAddress = connection.createStatement();
+                    ResultSet resultAddress = statmentAddress.executeQuery(queryAddress);
+                    while (resultAddress.next()){
+                        JSONObject jsonAddress = new JSONObject();
+                        jsonAddress.put("city", resultAddress.getString("city"));
+                        jsonAddress.put("province", resultAddress.getString("province"));
+                        jsonAddress.put("postcode", resultAddress.getString("postcode"));
+                        jsonAddressArray.put(jsonAddress);
+                    }
+                }catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                jsonUSer.put("addresses",jsonAddressArray);
                 jsonArray.put(jsonUSer);
             }
         }catch (SQLException e){
@@ -94,6 +109,26 @@ public class Users {
         return response;
     }
 
+//    public String getUsersAddress(String usersId){
+//        JSONArray jsonArray = new JSONArray();
+//        String query = "SELECT * FROM addresses WHERE id=" + usersId;
+//        try {
+//            Connection connection = sqlConnection.getConnection();
+//            Statement statement = connection.createStatement();
+//            ResultSet resultSet = statement.executeQuery(query);
+//            while (resultSet.next()){
+//                JSONObject jsonUSer = new JSONObject();
+//                jsonUSer.put("id", resultSet.getInt("id"));
+//                jsonUSer.put("city", resultSet.getInt("city"));
+//                jsonUSer.put("province", resultSet.getInt("province"));
+//                jsonUSer.put("postcode", resultSet.getInt("postcode"));
+//                jsonArray.put(jsonUSer);
+//            }
+//        }catch (SQLException e){
+//            e.printStackTrace();
+//        }
+//        return jsonArray.toString();
+//    }
     public String getUsersOrders(String usersId){
         JSONArray jsonArray = new JSONArray();
         String query = "SELECT * FROM orders WHERE buyer=" + usersId;
@@ -142,13 +177,14 @@ public class Users {
 
     public String getUserReview(String userId){
         JSONArray jsonArray = new JSONArray();
-        String query = "SELECT * FROM reviews INNER JOIN orders ON orders.id=reviews.'order' WHERE orders.buyer=" + userId;
+        String query = "SELECT * FROM reviews INNER JOIN orders ON orders.id=reviews.'order' INNER JOIN users ON users.id=orders.'buyer' WHERE orders.buyer=" + userId;
         try {
             Connection connection = sqlConnection.getConnection();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()){
                 JSONObject jsonUSer = new JSONObject();
+                jsonUSer.put("nama", resultSet.getString("first_name"));
                 jsonUSer.put("order", resultSet.getInt("order"));
                 jsonUSer.put("star", resultSet.getInt("star"));
                 jsonUSer.put("description", resultSet.getString("description"));
@@ -158,5 +194,64 @@ public class Users {
             e.printStackTrace();
         }
         return jsonArray.toString();
+    }
+    public String deleteMethod(int userId){
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+        try {
+            String query = "DELETE FROM users WHERE id=" + userId;
+            statement = this.sqlConnection.getConnection().prepareStatement(query);
+            rowsAffected = statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return rowsAffected + " rows deleted!";
+    }
+    public String postMethod(JSONObject requestBodyJson){
+        String firstName = requestBodyJson.optString("first_name");
+        String lastName = requestBodyJson.optString("last_name");
+        String email = requestBodyJson.optString("email");
+        String phoneNumber = requestBodyJson.optString("phone_number");
+        String type = requestBodyJson.optString("type");
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+
+        String query = "INSERT INTO users(first_name, last_name, email, phone_number, type) VALUES(?,?,?,?,?)";
+        try {
+            statement = sqlConnection.getConnection().prepareStatement(query);
+            statement.setString(1, firstName);
+            statement.setString(2, lastName);
+            statement.setString(3, email);
+            statement.setString(4, phoneNumber);
+            statement.setString(5, type);
+            rowsAffected = statement.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rowsAffected + " rows inserted!";
+    }
+
+    public String putMethod(String userId, JSONObject requestBodyJson){
+        String firstName = requestBodyJson.optString("first_name");
+        String lastName = requestBodyJson.optString("last_name");
+        String email = requestBodyJson.optString("email");
+        String phoneNumber = requestBodyJson.optString("phone_number");
+        String type = requestBodyJson.optString("type");
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+
+        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, type = ? WHERE id=" + userId;
+        try {
+            statement = sqlConnection.getConnection().prepareStatement(query);
+            statement.setString(1, firstName);
+            statement.setString(2, lastName);
+            statement.setString(3, email);
+            statement.setString(4, phoneNumber);
+            statement.setString(5, type);
+            rowsAffected = statement.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rowsAffected + " rows updated!";
     }
 }

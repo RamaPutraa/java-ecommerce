@@ -65,5 +65,62 @@ public class Orders {
         }
         return jsonArray.toString();
     }
+    public String postMethod(JSONObject requestBodyJson){
+        int buyer = requestBodyJson.optInt("buyer");
+        int note = requestBodyJson.optInt("note");
+        int total = requestBodyJson.optInt("total");
+        int discount = requestBodyJson.optInt("discount");
+        String is_paid = requestBodyJson.optString("is_paid");
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+        String query = "INSERT INTO orders(buyer, note, total, discount, is_paid) VALUES(?,?,?,?,?)";
+        try {
+            statement = sqlCon.getConnection().prepareStatement(query);
+            statement.setInt(1, buyer);
+            statement.setInt(2, note);
+            statement.setInt(3, total);
+            statement.setInt(4, discount);
+            statement.setString(5, is_paid);
+            rowsAffected = statement.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rowsAffected + " rows inserted!";
+    }
 
+    public String deleteMethod(String userId){
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+        try {
+            String query = "DELETE FROM orders WHERE id=" + userId;
+            statement = this.sqlCon.getConnection().prepareStatement(query);
+            rowsAffected = statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return rowsAffected + " rows deleted!";
+    }
+
+    public String putMethod(String userId, JSONObject requestBodyJson){
+        int buyer = requestBodyJson.optInt("buyer");
+        int note = requestBodyJson.optInt("note");
+        int total = requestBodyJson.optInt("total");
+        int discount = requestBodyJson.optInt("discount");
+        String is_paid = requestBodyJson.optString("is_paid");
+        PreparedStatement statement = null;
+        int rowsAffected = 0;
+        String query = "UPDATE orders SET buyer = ?, note = ?, total = ?, discount = ?, is_paid = ? WHERE id=" + userId;
+        try {
+            statement = sqlCon.getConnection().prepareStatement(query);
+            statement.setInt(1, buyer);
+            statement.setInt(2, note);
+            statement.setInt(3, total);
+            statement.setInt(4, discount);
+            statement.setString(5, is_paid);
+            rowsAffected = statement.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rowsAffected + " rows updated!";
+    }
 }
