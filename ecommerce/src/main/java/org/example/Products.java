@@ -20,7 +20,7 @@ public class Products {
                 query = "SELECT * FROM products";
                 break;
             default:
-                query = "SELECT * FROM products WHERE id="+productId;
+                query = "SELECT * FROM products INNER JOIN users ON users.id=products.'seller' WHERE users.id="+productId;
                 break;
         }
         try {
@@ -30,6 +30,7 @@ public class Products {
             while (resultSet.next()){
                 JSONObject jsonUSer = new JSONObject();
                 jsonUSer.put("id", resultSet.getInt("id"));
+                jsonUSer.put("first_name", resultSet.getString("first_name"));
                 jsonUSer.put("seller", resultSet.getInt("seller"));
                 jsonUSer.put("title", resultSet.getString("title"));
                 jsonUSer.put("description", resultSet.getString("description"));
